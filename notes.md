@@ -65,7 +65,5 @@
 
 - Local VCS Strategy (joejung/submission_master)
   - [merged] initialize
-  - [merged] plan data modeling 
-  - create_clients
-  - create_buildings
-  - create_custom_fields
+  - [merged] plan_data_modeling 
+  - create_data_models
