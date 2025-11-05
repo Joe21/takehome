@@ -3,10 +3,7 @@ FactoryBot.define do
     association :client
 
     sequence(:address) { |n| "#{Faker::Address.street_address} #{n}" }
-    zip5 { Faker::Address.zip_code[0..4] } 
-    state { Building.states.keys.sample }
-
-    # optional: sequence for uniqueness
-    sequence(:address) { |n| "123 Main St #{n}" }
+    zip_code { Faker::Number.number(digits: 5).to_s }
+    state { Building.states.keys.sample.to_s }
   end
 end

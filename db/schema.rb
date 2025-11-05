@@ -17,13 +17,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_192815) do
   create_table "buildings", force: :cascade do |t|
     t.bigint "client_id", null: false
     t.string "address", null: false
-    t.bigint "zip5", null: false
+    t.string "zip_code", null: false
     t.string "state", limit: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index "lower((address)::text)", name: "index_buildings_on_lower_address", unique: true
     t.index ["client_id"], name: "index_buildings_on_client_id"
-    t.index ["state", "zip5"], name: "index_buildings_on_state_and_zip5"
+    t.index ["state", "zip_code"], name: "index_buildings_on_state_and_zip_code"
   end
 
   create_table "clients", force: :cascade do |t|
