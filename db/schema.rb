@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_05_183224) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_05_192815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "buildings", force: :cascade do |t|
+    t.bigint "client_id", null: false
+    t.string "address", null: false
+    t.bigint "zip5", null: false
+    t.string "state", limit: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((address)::text)", name: "index_buildings_on_lower_address", unique: true
+    t.index ["client_id"], name: "index_buildings_on_client_id"
+    t.index ["state", "zip5"], name: "index_buildings_on_state_and_zip5"
+  end
 
   create_table "clients", force: :cascade do |t|
     t.string "name", null: false
@@ -20,4 +32,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_183224) do
     t.datetime "updated_at", null: false
     t.index "lower((name)::text)", name: "index_clients_on_lower_name", unique: true
   end
+
+  add_foreign_key "buildings", "clients"
 end
