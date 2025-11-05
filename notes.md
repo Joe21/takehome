@@ -22,7 +22,7 @@
 ### DATA MODELING
 - Client
   - id
-  - name (unique, case insensitive. Store the casing but ensure no dupes)
+  - name (unique, case insensitive / citext or not? Store the casing but ensure no dupes)
   - timestamps
 - Building
   - id
