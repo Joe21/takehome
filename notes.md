@@ -62,6 +62,9 @@
 - JSONB
   - Shift data dependencies out of the DB and into the class layer via validation engine
   - Utilize GIS indexing for performance needs (less than 150m homes in the US, should suffice). Convention to gatekeep nested data
+- We should only include the customvalue data on eagerload. The assumption is that not all clients may require any of this so reduce unnecessary fetching and we can segregate on a separate table should we need to ever need to correct metadata in an operation / maintenance.
+- 
+
 
 - Local VCS Strategy (joejung/submission_master)
   - [merged] initialize
