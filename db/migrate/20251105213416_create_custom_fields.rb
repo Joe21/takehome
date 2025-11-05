@@ -6,7 +6,7 @@ class CreateCustomFields < ActiveRecord::Migration[7.2]
       t.string :label, null: false
       t.string :field_type, null: false
       t.string :enum_options, array: true, default: []
-      t.boolean :required, default: false, null: false
+      t.boolean :active, default: false, null: false
       t.timestamps
     end
 

@@ -61,8 +61,10 @@
 - Persist presentational logic for custom field labels (this saves the FE time for what is typically clientside responsibility but we are the source of truth, not their hardcoded conditional logic)
 - JSONB
   - Shift data dependencies out of the DB and into the class layer via validation engine
+    - Avoid table creep as data classification is irregular. Square footage inside vs outside, above ground, GLA, finished, total_finished, etc 
+    - changing custom field + value definitions is easier in code vs altering DB schema (ex: type of walkway -> type of walkway material: [natural, synthetic, misc])
   - Utilize GIS indexing for performance needs (less than 150m homes in the US, should suffice). Convention to gatekeep nested data
-- We should only include the customvalue data on eagerload. The assumption is that not all clients may require any of this so reduce unnecessary fetching and we can segregate on a separate table should we need to ever need to correct metadata in an operation / maintenance.
+- We should segregate the custom_values table and only include them explicitly for eagerloading. The assumption is that not all clients may require the meta data or various service levels support that level of data provisioning to start with.
 - 
 
 

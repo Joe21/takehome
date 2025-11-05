@@ -39,7 +39,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_05_213416) do
     t.string "label", null: false
     t.string "field_type", null: false
     t.string "enum_options", default: [], array: true
-    t.boolean "required", default: false, null: false
+    t.boolean "active", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["client_id", "key"], name: "index_custom_fields_on_client_id_and_key", unique: true
