@@ -60,13 +60,21 @@
 - Envision data models that will increase volatility and irregularity as we scale
 - Persist presentational logic for custom field labels (this saves the FE time for what is typically clientside responsibility but we are the source of truth, not their hardcoded conditional logic)
 - JSONB
-  - Shift data dependencies out of the DB and into the class layer via validation engine
-    - Avoid table creep as data classification is irregular. Square footage inside vs outside, above ground, GLA, finished, total_finished, etc 
-    - changing custom field + value definitions is easier in code vs altering DB schema (ex: type of walkway -> type of walkway material: [natural, synthetic, misc])
-  - Utilize GIS indexing for performance needs (less than 150m homes in the US, should suffice). Convention to gatekeep nested data
-- We should segregate the custom_values table and only include them explicitly for eagerloading. The assumption is that not all clients may require the meta data or various service levels support that level of data provisioning to start with.
-- 
-
+  - Pros:
+    - Adding/removing fields doesn’t require migrations
+    - Flexibility: Each building can have a variable number of fields
+    - Limit table growth
+    - Validation changes are not tied to expensive DB schema migrations (avoid polymoprhic at scale)
+  - Cons:
+    - Harder to query by individual key
+    - App is repsonsible for validation logic
+    - Indexing K/V can become troublesome when nested
+  - Resolution:
+    - Add GIS indexing to boost performance for filtering
+    - Establish convention to never embed K/V for future PR reviews / codify this pattern
+  - Additional Consideration:
+    - We can technically add formal columns for text, number, date to custom_values and only use the json as a fallback further limiting JSONB structuring but the hybrid approach seems unattractive for more reasons.
+- We should segregate the custom_values table and only include them explicitly for eager loading. The assumption is that not all clients may require the meta data or various service levels support that level of data provisioning to start with.
 
 - Local VCS Strategy (joejung/submission_master)
   - [merged] initialize
