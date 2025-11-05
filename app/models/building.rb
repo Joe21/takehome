@@ -1,5 +1,5 @@
 class Building < ApplicationRecord
-  belongs_to :client
+  belongs_to :client, optional: true
 
   STATES = {
     AL: "AL", AK: "AK", AZ: "AZ", AR: "AR", CA: "CA", CO: "CO", CT: "CT", DE: "DE",
@@ -18,4 +18,7 @@ class Building < ApplicationRecord
   validates :state, presence: true, inclusion: { in: states.keys }
   # Validate U.S. zipcodes for 5 digits + optional 4 digit extension (12345-6789)
   validates :zip_code, presence: true, format: { with: /\A\d{5}(-\d{4})?\z/, message: "must be a valid ZIP code" }
+
+  scope :owned, -> { where.not(client_id: nil) }
+  scope :unowned, -> { where(client_id: nil) }
 end
