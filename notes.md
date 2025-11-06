@@ -94,14 +94,15 @@
   - Easy lift to migrate this pattern over to a dedicated NoSQL solution
 - Cons
   - JSONB usage in a relational database can be viewed as an anti-pattern, especially if left unchecked
-  - More difficulty querying analytics and filtering
+  - Possibly more cumbersome to run analytics
 
 ### Implementation Considerations
 - Keep the SQL side extremely easy
 - The K/V storage must stay flat. Do not embed or introduce complex objects!
   - Denote type in key name using some sort of delimiter
   - Store data contract for enum types in yaml for now (short term MVP approach)
-- Add GIS indexing on keys to ensure quick filtering and querying
+- Manage client custom_fields as a schema_store
+- Manage the actual custom data on the buildings via 
 - 2 separate controllers for different stakeholders (namespaced for clients mutating buildings vs external buildings api + eager load the custom_fields)
 
 ##### Older Debunked Considerations
@@ -109,15 +110,15 @@
 - data duplication for multi tenant uses
 - irregularity of data and frequent schema changes + migrations
 - CRUD relabeling presentational values per client per custom_field
+- Add GIS indexing on keys to ensure quick filtering and querying
 
 ### Each Branch is essentially a ticket
 Local VCS Strategy (joejung/submission_master)
 - [merged] initialize
 - [merged] plan_data_modeling 
 - [merged] create_data_models
-- [] revise_data_models
-  - remove custom_values
-  - update custom_fields
+- [merged] revise_data_models
+- [x] separate_schema_and_data 
 - [] seed_file
 - [] controller
 - [] cleanup

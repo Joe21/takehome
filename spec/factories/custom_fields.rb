@@ -1,12 +1,14 @@
 FactoryBot.define do
   factory :custom_field do
     association :client
-    association :building
-    field_store do
+
+    schema_store do
       {
-        "number::num_bathrooms" => 2,
-        "string::exterior_material" => "Brick",
-        "enum::walkway_type" => "concrete"
+        "num_bathrooms"    => "number",
+        "exterior_material"=> "string",
+        "walkway_type"     => ["brick", "concrete", "none", "unknown"],
+        "heating_type"     => ["gas", "electric", "oil", "none", "unknown"],
+        "floor_type"       => ["hardwood", "carpet", "tile", "unknown"]
       }
     end
   end

@@ -1,67 +1,48 @@
 class CustomField < ApplicationRecord
-  belongs_to :building
   belongs_to :client
 
-  validate :field_store_must_be_hash
-  validate :validate_field_types
+  VALID_TYPES = %w[number string].freeze
 
+  validate :schema_store_must_be_hash
+  validate :validate_schema_store
+
+  # Example schema_store :
   # {
-  #   "number::num_bathrooms" => 2.5,
-  #   "string::exterior_material" => "Brick",
-  #   "enum::walkway_type" => "concrete",
+  #   "num_bathrooms" => "number",
+  #   "exterior_material" => "string",
+  #   "walkway_type" => ["brick", "concrete", "none", "unknown"]
   # }
-
-  # Update stores using this method. Avoid overloading AR and raise a loud error
-  def update_field_store(new_fields)
-    self.field_store = field_store.merge(new_fields)
-    save!
-  end
-
-  # Make this public for now. Downcase all enum values for uniformity
-  def allowed_enum_values(key)
-    enum_key = key.split("::", 2).last.to_sym
-    self.class.enum_config[enum_key] || [].map(&:downcase)
-  end
 
   private
 
-  def field_store_must_be_hash
-    return errors.add(:field_store, "must be a hash") if field_store.nil?
-    
-    errors.add(:field_store, "must be a hash") unless field_store.is_a?(Hash)
+  def schema_store_must_be_hash
+    return errors.add(:schema_store, "must be a hash") if schema_store.nil?
+
+    errors.add(:schema_store, "must be a hash") unless schema_store.is_a?(Hash)
   end
 
-  def validate_field_types
-    return unless field_store.is_a?(Hash) && field_store.present?
+  def validate_schema_store
+    return unless schema_store.is_a?(Hash)
 
-    field_store.each do |key, value|
-      # Use :: to delimit type in key to avoid nested objects
-      type, label = key.split("::", 2)
-      unless type.present? && label.present?
-        errors.add(:field_store, "Invalid key format: #{key}")
+    schema_store.each do |key, value|
+      if key.blank?
+        errors.add(:schema_store, "Key cannot be blank")
         next
       end
 
-      case type
-      when "number"
-        errors.add(:field_store, "Invalid number for #{key}") unless value.is_a?(Numeric)
-      when "string"
-        errors.add(:field_store, "Invalid string for #{key}") unless value.is_a?(String)
-      when "enum"
-        allowed = allowed_enum_values(key).map(&:downcase)
-        errors.add(:field_store, "Invalid enum for #{key}") unless allowed.include?(value.to_s.downcase)
+      case value
+      # valid types
+      when *VALID_TYPES
+        next
+      # valid array of strings
+      when Array
+        if value.empty? || !value.all? { |v| v.is_a?(String) }
+          errors.add(:schema_store, "Enum array must contain at least one string for #{key}")
+        end
+      # unrecognized
       else
-        errors.add(:field_store, "Unknown type prefix in #{key}")
+        errors.add(:schema_store, "Invalid type/value for #{key}")
       end
     end
-  end
-
-
-  def enum_config
-    self.class.enum_config
-  end
-
-  def self.enum_config
-    @enum_config ||= YAML.load_file(Rails.root.join('app/models/custom_field_enums.yml')).deep_symbolize_keys
   end
 end

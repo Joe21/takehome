@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_06_193314) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_06_223749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -35,17 +35,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_06_193314) do
 
   create_table "custom_fields", force: :cascade do |t|
     t.bigint "client_id", null: false
-    t.bigint "building_id", null: false
-    t.jsonb "field_store", default: {}, null: false
+    t.jsonb "schema_store", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["building_id", "client_id"], name: "index_custom_fields_on_building_id_and_client_id", unique: true
-    t.index ["building_id"], name: "index_custom_fields_on_building_id"
     t.index ["client_id"], name: "index_custom_fields_on_client_id"
-    t.index ["field_store"], name: "index_custom_fields_on_field_store", using: :gin
   end
 
   add_foreign_key "buildings", "clients"
-  add_foreign_key "custom_fields", "buildings"
   add_foreign_key "custom_fields", "clients"
 end
