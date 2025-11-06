@@ -79,4 +79,7 @@
 - Local VCS Strategy (joejung/submission_master)
   - [merged] initialize
   - [merged] plan_data_modeling 
-  - create_data_models
+  - [merged] create_data_models
+  - [] seed_file
+  - [] controller
+  - [] cleanup
