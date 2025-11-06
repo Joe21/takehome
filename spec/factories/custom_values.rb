@@ -1,12 +1,12 @@
-# spec/factories/custom_values.rb
 FactoryBot.define do
   factory :custom_value do
     association :building
 
-    values do
-      building.client.custom_fields.each_with_object({}) do |field, hash|
-        next unless field.active
-
+    # Populate values hash after the building and its client exist
+    after(:build) do |custom_value|
+      client = custom_value.building.client
+      
+      custom_value.values = client.custom_fields.each_with_object({}) do |field, hash|
         hash[field.key] = case field.field_type
         when 'number'
           rand(1..5) + [0, 0.5].sample
