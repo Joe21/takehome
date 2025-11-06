@@ -2,9 +2,8 @@ class CustomField < ApplicationRecord
   belongs_to :building
   belongs_to :client
 
-  validates :field_store, presence: true
   validate :field_store_must_be_hash
-  validate :validate_field_types
+  # validate :validate_field_types
 
   # {
   #   "number::num_bathrooms" => 2.5,
@@ -27,15 +26,19 @@ class CustomField < ApplicationRecord
   private
 
   def field_store_must_be_hash
+    return errors.add(:field_store, "must be a hash") if field_store.nil?
+    
     errors.add(:field_store, "must be a hash") unless field_store.is_a?(Hash)
   end
 
   def validate_field_types
+    return unless field_store.is_a?(Hash)
+
     field_store.each do |key, value|
       # Use :: to delimit type in key to avoid nested objects
       type, label = key.split("::", 2)
 
-      unless type && label
+      unless type.present? && label.present?
         errors.add(:field_store, "Invalid key format: #{key}")
         next
       end
