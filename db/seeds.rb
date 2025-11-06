@@ -7,3 +7,9 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo'].each do |name|
+  Client.find_or_create_by!(name:)
+end
+
+

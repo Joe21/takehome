@@ -53,33 +53,72 @@
 - custom_value belongs_to :building
 - custom_field belongs_to :client
 
-### CONSIDERATIONS
-- All custom_values must be owned by a building. Clients should not get separate versions of a walkway to the same building
-- Avoid database duplication. We need a multi tenant configurable schema
-- Not required but essentially allow us to CRUD a data contract per client. Allow what shared data each client can pluck from the single source of custom data truth.
-- Envision data models that will increase volatility and irregularity as we scale
-- Persist presentational logic for custom field labels (this saves the FE time for what is typically clientside responsibility but we are the source of truth, not their hardcoded conditional logic)
-- JSONB
-  - Pros:
-    - Adding/removing fields doesn’t require migrations
-    - Flexibility: Each building can have a variable number of fields
-    - Limit table growth
-    - Validation changes are not tied to expensive DB schema migrations (avoid polymoprhic at scale)
-  - Cons:
-    - Harder to query by individual key
-    - App is repsonsible for validation logic
-    - Indexing K/V can become troublesome when nested
-  - Resolution:
-    - Add GIS indexing to boost performance for filtering
-    - Establish convention to never embed K/V for future PR reviews / codify this pattern
-  - Additional Consideration:
-    - We can technically add formal columns for text, number, date to custom_values and only use the json as a fallback further limiting JSONB structuring but the hybrid approach seems unattractive for more reasons.
-- We should segregate the custom_values table and only include them explicitly for eager loading. The assumption is that not all clients may require the meta data or various service levels support that level of data provisioning to start with.
+### Design
+- We are building a client facing abstraction layer. Custom values are responsible from the building owner/rep. They are not coming from an internal data warehouse or other source of truth. Volatility / resolution of custom_fields is not our operational perview. 
+- External API consumers are going to receive all custom fields and values provided by the owner.
+- CRUD data is destroyed. There is no implicit reason for us to save changes and nor have to revert back to previous values by client request. 
+- Clients can change and reuse our system. Buildings can have multiple custom_fields per 
+- We are not responsible for the source of truth, that is the responsiblity of the clients who CRUD their data using our platform. No need to support migrations and other data sanitization operations from a data warehouse source.
+
+##### Pure Relational Design
+- Implementation
+  - Clients have buildings 
+  - Buildings have many custom_fields per client_id
+  - custom_fields has 3 types and houses validation logic
+- Pros
+  - Simple, flat 3 models, pure SQL. Easy to work with, query + filter
+- Cons
+  - Assuming buildings easily have hundreds of custom_fields, field changes become expensive transactions.
+  - Ownership changes will occur frequently as well during the lifetime of this application.
+- Considerations
+  - We can async updates into a job. External api consumption is no longer guaranteed to provide real time data
+  - Cost of transactions will continue to become more expensive at scale but async would provide a manageable medium term solution at reasonable cost.
+
+##### NOSQL Integrated Design
+- Implementation
+  - Add a long term NoSQL DB to house the dynamic data needs for custom_fields. Something like Mongo or maybe Dynamo.
+  - We store all the custom_field data along with the building_id an client_id to the document.
+- Pros
+  - Fast look ups using building_id and client_id indexes.
+  - Fast writes as transactions are 1 shot, long term scale is alleviated.
+- Cons
+  - Additional overhead added to the stack.
+  - Find the right DB and provider to ensure it is not overkill / cost prohibitive
+
+##### HYBRID - TAKE HOME APPROPRIATE
+- Implementation
+  - Design for a NoSQL solution but for now, prove the MVP to scale by implementing JSONB into the rails application to act as a temporary K/V storage
+- Pros
+  - Uses the infrastructure we already have
+  - Avoids overkill solution we may not have 
+  - Easy lift to migrate this pattern over to a dedicated NoSQL solution
+- Cons
+  - JSONB usage in a relational database can be viewed as an anti-pattern, especially if left unchecked
+  - More difficulty querying analytics and filtering
+
+### Implementation Considerations
+- Keep the SQL side extremely easy
+- The K/V storage must stay flat. Do not embed or introduce complex objects!!!
+- Add GIS indexing on keys to ensure quick filtering and querying
+- 2 separate controllers for different stakeholders (namespaced for clients mutating buildings vs external buildings api + eager load the custom_fields)
+
+
+##### Older Debunked Considerations
+- [AVOID THIS] Storing the single source of truth per building / warehousing the data and then allowing clients to cherry pick + relabel their data. This is not a consideration we need to support atm. In this scenario external API consumers may want to CRUD custom_fields so we can persist their preference and they can customize the shape of their payload. 
+  - data duplication for multi tenant uses
+  - irregularity of data and frequent schema changes + migrations
+  - relabeling of presentational values per client
+
+
+###### OLD AND DEBUNKED
 
 - Local VCS Strategy (joejung/submission_master)
   - [merged] initialize
   - [merged] plan_data_modeling 
   - [merged] create_data_models
+  - [] revise_data_models
+    - remove custom_values
+    - update custom_fields
   - [] seed_file
   - [] controller
   - [] cleanup

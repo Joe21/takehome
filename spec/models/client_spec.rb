@@ -6,7 +6,6 @@ RSpec.describe Client, type: :model do
   let(:name) { "Acme Co." }
 
   it { is_expected.to have_many(:buildings) }
-  it { is_expected.to have_many(:custom_fields).dependent(:destroy) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }

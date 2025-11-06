@@ -7,6 +7,8 @@ services:
      POSTGRES_DB: engineering_take_home_development
      POSTGRES_USER: app
      POSTGRES_PASSWORD: takehome
+   ports:
+     - "5433:5432"   # Expose container’s 5432 to my 5433
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && yarn && bundle && ./bin/dev"
