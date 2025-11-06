@@ -98,27 +98,26 @@
 
 ### Implementation Considerations
 - Keep the SQL side extremely easy
-- The K/V storage must stay flat. Do not embed or introduce complex objects!!!
+- The K/V storage must stay flat. Do not embed or introduce complex objects!
+  - Denote type in key name using some sort of delimiter
 - Add GIS indexing on keys to ensure quick filtering and querying
 - 2 separate controllers for different stakeholders (namespaced for clients mutating buildings vs external buildings api + eager load the custom_fields)
 
 
 ##### Older Debunked Considerations
-- [AVOID THIS] Storing the single source of truth per building / warehousing the data and then allowing clients to cherry pick + relabel their data. This is not a consideration we need to support atm. In this scenario external API consumers may want to CRUD custom_fields so we can persist their preference and they can customize the shape of their payload. 
-  - data duplication for multi tenant uses
-  - irregularity of data and frequent schema changes + migrations
-  - relabeling of presentational values per client
+[AVOID THIS] Storing the single source of truth per building / warehousing the data and then allowing clients to cherry pick + relabel their data. This is not a consideration we need to support atm. In this scenario external API consumers may want to CRUD custom_fields so we can persist their preference and they can customize the shape of their payload. 
+- data duplication for multi tenant uses
+- irregularity of data and frequent schema changes + migrations
+- CRUD relabeling presentational values per client per custom_field
 
-
-###### OLD AND DEBUNKED
-
-- Local VCS Strategy (joejung/submission_master)
-  - [merged] initialize
-  - [merged] plan_data_modeling 
-  - [merged] create_data_models
-  - [] revise_data_models
-    - remove custom_values
-    - update custom_fields
-  - [] seed_file
-  - [] controller
-  - [] cleanup
+### Each Branch is essentially a ticket
+Local VCS Strategy (joejung/submission_master)
+- [merged] initialize
+- [merged] plan_data_modeling 
+- [merged] create_data_models
+- [] revise_data_models
+  - remove custom_values
+  - update custom_fields
+- [] seed_file
+- [] controller
+- [] cleanup
