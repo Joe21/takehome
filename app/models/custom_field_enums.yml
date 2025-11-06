@@ -1,0 +1,18 @@
+walkway_type:
+  - brick
+  - concrete
+  - none
+  - unknown
+
+heating_type:
+  - gas
+  - electric
+  - oil
+  - none
+  - unknown
+
+floor_type:
+  - hardwood
+  - carpet
+  - tile
+  - unknown

@@ -6,17 +6,22 @@ class CustomField < ApplicationRecord
   validate :field_store_must_be_hash
   validate :validate_field_types
 
-  # Update stores using this method. Avoid overloading AR and raise a loud error
   # {
-  #   "number::num_bathrooms" => 2,
+  #   "number::num_bathrooms" => 2.5,
   #   "string::exterior_material" => "Brick",
-  #   "enum::walkway_type" => "Concrete",
-  #   "number::floor_count" => 5
+  #   "enum::walkway_type" => "concrete",
   # }
 
+  # Update stores using this method. Avoid overloading AR and raise a loud error
   def update_field_store(new_fields)
     self.field_store = field_store.merge(new_fields)
     save!
+  end
+
+  # Make this public for now
+  def allowed_enum_values(key)
+    enum_key = key.split("::", 2).last.to_sym
+    self.class.enum_config[enum_key] || []
   end
 
   private
@@ -41,18 +46,19 @@ class CustomField < ApplicationRecord
       when "string"
         errors.add(:field_store, "Invalid string for #{key}") unless value.is_a?(String)
       when "enum"
-        allowed = allowed_enum_values(key)
-        errors.add(:field_store, "Invalid enum for #{key}") unless allowed.include?(value)
+        allowed = allowed_enum_values(key).map(&:downcase)
+        errors.add(:field_store, "Invalid enum for #{key}") unless allowed.include?(value.to_s.downcase)
       else
         errors.add(:field_store, "Unknown type prefix in #{key}")
       end
     end
   end
 
-  # Placeholder: enum options can be defined per key
-  def allowed_enum_values(key)
-    {
-      "enum::walkway_type" => ["Brick", "Concrete", "None"]
-    }[key] || []
+  def enum_config
+    self.class.enum_config
+  end
+
+  def self.enum_config
+    @enum_config ||= YAML.load_file(Rails.root.join('app/models/custom_field_enums.yml')).deep_symbolize_keys
   end
 end
