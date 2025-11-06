@@ -3,7 +3,7 @@ class CustomField < ApplicationRecord
   belongs_to :client
 
   validate :field_store_must_be_hash
-  # validate :validate_field_types
+  validate :validate_field_types
 
   # {
   #   "number::num_bathrooms" => 2.5,
@@ -17,10 +17,10 @@ class CustomField < ApplicationRecord
     save!
   end
 
-  # Make this public for now
+  # Make this public for now. Downcase all enum values for uniformity
   def allowed_enum_values(key)
     enum_key = key.split("::", 2).last.to_sym
-    self.class.enum_config[enum_key] || []
+    self.class.enum_config[enum_key] || [].map(&:downcase)
   end
 
   private
@@ -32,12 +32,11 @@ class CustomField < ApplicationRecord
   end
 
   def validate_field_types
-    return unless field_store.is_a?(Hash)
+    return unless field_store.is_a?(Hash) && field_store.present?
 
     field_store.each do |key, value|
       # Use :: to delimit type in key to avoid nested objects
       type, label = key.split("::", 2)
-
       unless type.present? && label.present?
         errors.add(:field_store, "Invalid key format: #{key}")
         next
@@ -56,6 +55,7 @@ class CustomField < ApplicationRecord
       end
     end
   end
+
 
   def enum_config
     self.class.enum_config
