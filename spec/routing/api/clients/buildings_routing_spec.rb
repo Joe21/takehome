@@ -1,24 +1,26 @@
 require 'rails_helper'
 
-RSpec.describe Api::BuildingsController, type: :routing do
-  let(:client_id) { '1' }
-  let(:building_id) { '2' }
+RSpec.describe Api::Clients::BuildingsController, type: :routing do
+  subject { send(method, url) }
 
-  describe 'index' do
-    subject { { get: "/api/clients/#{client_id}/buildings" } }
+  let(:method) { :get }
+  let(:url) { '/api/clients/buildings' }
 
-    it { is_expected.to route_to('api/buildings#index', client_id:) }
+  describe 'GET #index' do
+    it { is_expected.to route_to('api/clients/buildings#index') }
   end
 
-  describe 'create' do
-    subject { { post: "/api/clients/#{client_id}/buildings" } }
-
-    it { is_expected.to route_to("api/buildings#create", client_id:) }
+  describe 'POST #create' do
+    let(:method) { :post }
+    
+    it { is_expected.to route_to('api/clients/buildings#create') }
   end
 
-  describe 'update' do
-    subject { { put: "/api/clients/#{client_id}/buildings/#{building_id}" } }
+  describe 'PUT #update' do
+    let(:method) { :put }
+    let(:url) { "/api/clients/buildings/#{building_id}" }
+    let(:building_id) { '2' }
 
-    it { is_expected.to route_to('api/buildings#update', client_id:, id: building_id) }
-  end  
+    it { is_expected.to route_to('api/clients/buildings#update', id: building_id) }
+  end
 end

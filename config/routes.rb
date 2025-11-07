@@ -3,8 +3,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   
   namespace :api do
-    resources :clients, only: [] do
-      resources :buildings, only: [:create, :update, :index], module: :clients
+    namespace :clients, only: [] do
+      resources :buildings, only: [:index, :create, :update]
     end
   end
 

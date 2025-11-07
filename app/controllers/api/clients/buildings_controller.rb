@@ -1,7 +1,7 @@
 module Api
   module Clients
-    class BuildingsController < ApplicationController
-      # http://localhost:3000/api/clients/1/buildings
+    class BuildingsController < BaseController
+      # http://localhost:3000/api/clients/buildings
       def index
         render json: { status: :ok, buildings: [] }
       end
