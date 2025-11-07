@@ -1,24 +1,47 @@
 class Building < ApplicationRecord
+  include UsStates
+
   belongs_to :client, optional: true
 
-  STATES = {
-    AL: "AL", AK: "AK", AZ: "AZ", AR: "AR", CA: "CA", CO: "CO", CT: "CT", DE: "DE",
-    FL: "FL", GA: "GA", HI: "HI", ID: "ID", IL: "IL", IN: "IN", IA: "IA", KS: "KS",
-    KY: "KY", LA: "LA", ME: "ME", MD: "MD", MA: "MA", MI: "MI", MN: "MN", MS: "MS",
-    MO: "MO", MT: "MT", NE: "NE", NV: "NV", NH: "NH", NJ: "NJ", NM: "NM", NY: "NY",
-    NC: "NC", ND: "ND", OH: "OH", OK: "OK", OR: "OR", PA: "PA", RI: "RI", SC: "SC",
-    SD: "SD", TN: "TN", TX: "TX", UT: "UT", VT: "VT", VA: "VA", WA: "WA", WV: "WV",
-    WI: "WI", WY: "WY"
-  }.freeze
-
-  # Safe enum declaration to avoid Rails internal mapping violations when frozen
-  enum :state, STATES.dup
+  enum :state, UsStates::STATES
 
   validates :address, presence: true, uniqueness: { scope: :client_id, case_sensitive: false }
-  validates :state, presence: true, inclusion: { in: states.keys }
-  # Validate U.S. zipcodes for 5 digits + optional 4 digit extension (12345-6789)
+  validates :state, presence: true
+  # Validates ZIP to also allow 4-digit extension (12345-6789)
   validates :zip_code, presence: true, format: { with: /\A\d{5}(-\d{4})?\z/, message: "must be a valid ZIP code" }
+  validate :validate_custom_field_values
 
-  scope :owned, -> { where.not(client_id: nil) }
-  scope :unowned, -> { where(client_id: nil) }
+  private
+
+  # Example custom_field_values
+  # {
+  #   "num_bathrooms"   => 2,
+  #   "exterior_material" => "Wood",
+  #   "walkway_type"    => "concrete",
+  #   "heating_type"    => "gas"
+  # }
+  def validate_custom_field_values
+    return unless client && custom_field_values.is_a?(Hash)
+
+    client.custom_fields.each do |cf|
+      cf.schema_store.each do |key, expected_type|
+        value = custom_field_values[key]
+
+        # Validate strings or numbers
+        if CustomField::VALID_TYPES.include?(expected_type)
+          unless value.is_a?(expected_type == "number" ? Numeric : String)
+            errors.add(:custom_field_values, "Invalid value for #{key}: expected #{expected_type}")
+          end
+        # Validate enum values
+        elsif expected_type.is_a?(Array)
+          if expected_type.empty? || !expected_type.map(&:downcase).include?(value.to_s.downcase)
+            errors.add(:custom_field_values, "Invalid enum value for #{key}")
+          end
+        # Unknown type in schema_store
+        else
+          errors.add(:custom_field_values, "Unknown type for #{key}")
+        end
+      end
+    end
+  end
 end

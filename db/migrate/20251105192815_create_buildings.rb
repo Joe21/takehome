@@ -4,7 +4,7 @@ class CreateBuildings < ActiveRecord::Migration[7.2]
       t.references :client, null: false, foreign_key: true
       t.string :address, null: false
       t.string :zip_code, null: false
-      t.string :state, limit: 2, null: false
+      t.integer :state, null: false, default: 0
       t.timestamps
     end
 
