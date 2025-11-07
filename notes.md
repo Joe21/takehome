@@ -119,6 +119,5 @@ Local VCS Strategy (joejung/submission_master)
 - [merged] create_data_models
 - [merged] revise_data_models
 - [x] separate_schema_and_data 
-- [] seed_file
 - [] controller
 - [] cleanup
