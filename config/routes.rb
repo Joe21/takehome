@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   
   namespace :api do
     resources :clients, only: [] do
-      resources :buildings, only: [:create, :update, :index]
+      resources :buildings, only: [:create, :update, :index], module: :clients
     end
   end
 
