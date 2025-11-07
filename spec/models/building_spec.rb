@@ -50,5 +50,56 @@ RSpec.describe Building, type: :model do
 
       it { is_expected.to be_valid }
     end
+
+    describe 'custom_field_values validations' do
+      before do
+        create(:custom_field, client: client, schema_store: {
+          "num_bathrooms"   => "number",
+          "exterior_material" => "string",
+          "walkway_type"    => ["concrete", "gravel", "asphalt"]
+        })
+      end
+
+      context 'when valid values are provided' do
+        before do
+          subject.custom_field_values = {
+            "num_bathrooms"    => 2,
+            "exterior_material" => "Wood",
+            "walkway_type"     => "gravel"
+          }
+        end
+
+        it 'is valid' do
+          expect(subject).to be_valid
+        end
+      end
+
+      context 'when an invalid number is provided' do
+        before { subject.custom_field_values = { "num_bathrooms" => "two" } }
+
+        it 'is invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:custom_field_values]).to include(/Invalid value for num_bathrooms/)
+        end
+      end
+
+      context 'when an invalid string is provided' do
+        before { subject.custom_field_values = { "exterior_material" => 123 } }
+
+        it 'is invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:custom_field_values]).to include(/Invalid value for exterior_material/)
+        end
+      end
+
+      context 'when an invalid enum value is provided' do
+        before { subject.custom_field_values = { "walkway_type" => "brick" } }
+
+        it 'is invalid' do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:custom_field_values]).to include(/Invalid enum value for walkway_type/)
+        end
+      end
+    end
   end
 end
