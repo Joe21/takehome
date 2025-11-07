@@ -1,3 +1,8 @@
+## Delete in dependency order (if needed)
+# Building.delete_all
+# CustomField.delete_all
+# Client.delete_all
+
 # Seed 5 Clients
 clients = ['Alpha Co.', 'Bravo Co.', 'Charlie Co.', 'Delta Co.', 'Echo Co.'].map do |name|
   client = Client.find_or_create_by!(name:)
@@ -55,28 +60,28 @@ clients.each do |client|
   case client.name
   when 'Alpha Co.'
     buildings = [
-      { address: "101 Alpha St", zip_code: "10001", state: "NY", custom_field_values: {"num_bathrooms"=>2, "exterior_material"=>"Brick", "walkway_type"=>"concrete"} },
-      { address: "102 Alpha Ave", zip_code: "10002", state: "NY", custom_field_values: {"num_bathrooms"=>3, "exterior_material"=>"Wood", "walkway_type"=>"gravel"} }
+      { address: "1 State Street", zip_code: "10001", state: "NY", custom_field_values: {"num_bathrooms"=>2, "exterior_material"=>"Brick", "walkway_type"=>"concrete"} },
+      { address: "1 Saint Street", zip_code: "10002", state: "NY", custom_field_values: {"num_bathrooms"=>3, "exterior_material"=>"Wood", "walkway_type"=>"gravel"} }
     ]
   when 'Bravo Co.'
     buildings = [
-      { address: "201 Bravo St", zip_code: "20001", state: "NJ", custom_field_values: {"interior_material"=>"Oak", "bedroom_count"=>4} },
-      { address: "202 Bravo Ave", zip_code: "20002", state: "NJ", custom_field_values: {"interior_material"=>"Pine", "bedroom_count"=>3} }
+      { address: "2-3 Bla bla Blvd", zip_code: "20001", state: "NJ", custom_field_values: {"interior_material"=>"Oak", "bedroom_count"=>4} },
+      { address: "222 Bay Terrace" , zip_code: "20002", state: "NJ", custom_field_values: {"interior_material"=>"Pine", "bedroom_count"=>3} }
     ]
   when 'Charlie Co.'
     buildings = [
-      { address: "301 Charlie Rd", zip_code: "30001", state: "GA", custom_field_values: {"bedroom_window_type"=>"double", "indoor_pool_sqft"=>500} },
-      { address: "302 Charlie Blvd", zip_code: "30002", state: "GA", custom_field_values: {"bedroom_window_type"=>"triple", "indoor_pool_sqft"=>750} }
+      { address: "333 Charlie Rd", zip_code: "30001", state: "GA", custom_field_values: {"bedroom_window_type"=>"double", "indoor_pool_sqft"=>500} },
+      { address: "333 Charlie Blvd", zip_code: "30002", state: "GA", custom_field_values: {"bedroom_window_type"=>"triple", "indoor_pool_sqft"=>750} }
     ]
   when 'Delta Co.'
     buildings = [
-      { address: "401 Delta Dr", zip_code: "40001", state: "IL", custom_field_values: {"num_solar_panels"=>20, "energy_efficiency_rating"=>"A"} },
-      { address: "402 Delta Ln", zip_code: "40002", state: "IL", custom_field_values: {"num_solar_panels"=>15, "energy_efficiency_rating"=>"B"} }
+      { address: "111 Evergreen Terrace", zip_code: "40001", state: "IL", custom_field_values: {"num_solar_panels"=>20, "energy_efficiency_rating"=>"A"} },
+      { address: "111 Everblue Terrace", zip_code: "40002", state: "IL", custom_field_values: {"num_solar_panels"=>15, "energy_efficiency_rating"=>"B"} }
     ]
   when 'Echo Co.'
     buildings = [
-      { address: "501 Echo St", zip_code: "50001", state: "CA", custom_field_values: {"year_built"=>1920, "was_church"=>"yes"} },
-      { address: "502 Echo Ave", zip_code: "50002", state: "CA", custom_field_values: {"year_built"=>1985, "was_church"=>"no"} }
+      { address: "123 Elm Str", zip_code: "50001", state: "CA", custom_field_values: {"year_built"=>1920, "was_church"=>"yes"} },
+      { address: "123 Oak Street", zip_code: "50002", state: "CA", custom_field_values: {"year_built"=>1985, "was_church"=>"no"} }
     ]
   end
 
