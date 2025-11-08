@@ -3,6 +3,8 @@ module Buildings
     class Error < StandardError; end
     class ValidationError < StandardError; end
 
+    attr_reader :client, :params
+
     def initialize(client, params)
       @client = client
       @params = params.permit(:address, :zip_code, :state, custom_field_values: {})
@@ -10,7 +12,7 @@ module Buildings
 
     def call
       validate_custom_fields!
-      building = client.buildings.new(filtered_params)
+      building = client.buildings.new(params)
 
       if building.save
         { building: serialize(building) }
@@ -27,17 +29,6 @@ module Buildings
     end
 
     private
-
-    attr_reader :client, :params
-
-    def filtered_params
-      {
-        address: params[:address],
-        zip_code: params[:zip_code],
-        state: params[:state],
-        custom_field_values: params[:custom_field_values] || {}
-      }
-    end
 
     def validate_custom_fields!
       cf_keys = client.custom_fields.flat_map { |cf| cf.schema_store.keys }.uniq

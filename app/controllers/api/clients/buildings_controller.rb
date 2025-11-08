@@ -20,6 +20,7 @@ module Api
         # INSERT ERROR MONITORING ex: Rollbar / Sentry
         render json: formatter(errors: [e.message]), status: :internal_server_error
       end
+
       # def update
       #   result = Buildings::Update.new(current_client, building_params).call
       #   render json: format_response(result), status: :created
