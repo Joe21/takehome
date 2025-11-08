@@ -4,10 +4,8 @@ module Api
       private
 
       def current_client
-        # SPOOF FOR DEVELOPMENT
-          return Client.first if Rails.env.development?
-
-        @current_client ||= Client.find(params[:client_id])
+        # SPOOF AUTHENTICATION
+        @current_client ||= Client.first
       rescue ActiveRecord::RecordNotFound
         render json: { status: :not_found, errors: ['Client not found'] }, status: :not_found
       end

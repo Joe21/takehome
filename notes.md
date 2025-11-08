@@ -118,11 +118,11 @@ Local VCS Strategy (joejung/submission_master)
 - [merged] plan_data_modeling 
 - [merged] create_data_models
 - [merged] revise_data_models
-- [x] separate_schema_and_data 
-- [] controller
-  - setup
-  - payload
-  - pagination
+- [merged] separate_schema_and_data 
+- [] create_controllers
+  - [x] setup
+  - [x] payload
+  - [x] pagination
   - 
 - [] cleanup
 
