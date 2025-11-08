@@ -37,7 +37,7 @@ RSpec.describe Buildings::Index do
     let(:first_building) { subject[:buildings].first }
     let(:result_ids) { subject[:buildings].map { |b| b[:id] } }
     let(:all_custom_fields) { client.custom_fields.flat_map { |cf| cf.schema_store.keys }.uniq }
-    let(:field_values) { subject[:buildings].map { |b| all_custom_fields.index_with { |k| b[k] } } } 
+    let(:field_values) {}
 
     it 'returns only buildings for the current client' do
       expect(result_ids).to match_array(buildings.map(&:id))
@@ -58,6 +58,7 @@ RSpec.describe Buildings::Index do
     end
 
     it 'includes the correct custom field values for each building' do
+      field_values = subject[:buildings].map { |b| all_custom_fields.index_with { |k| b[k] } }
       expect(field_values).to include({
         "rock_wall_size" => 15,
         "rock_wall_length" => 26,
@@ -70,6 +71,12 @@ RSpec.describe Buildings::Index do
         "brick_color" => "red",
         "brick_count" => 120
       })
+    end
+
+    it 'does not include custom fields from other clients' do
+      subject[:buildings].each do |b|
+        expect(b.keys).not_to include("glass_window_count")
+      end
     end
 
     context 'when an error occurs' do
