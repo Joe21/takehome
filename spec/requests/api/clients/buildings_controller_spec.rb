@@ -14,36 +14,41 @@ RSpec.describe "Api::Clients::Buildings", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    # it 'returns JSON with a data' do
-    #   subject
-    #   expect(parsed_resp).to include('data')
-    # end
+    it 'the correct json structure' do
+      subject
+      expect(parsed_resp.keys).to include('status', 'status_code', 'data')
+    end
+    
+    it 'calls the Buildings::Index use case' do
+      use_case = instance_double(Buildings::Index, call: { buildings: [] })
+      allow(Buildings::Index).to receive(:new).with(client).and_return(use_case)
+      subject
+      expect(Buildings::Index).to have_received(:new).with(client)
+      expect(use_case).to have_received(:call)
+    end
 
-    # it 'calls the appropriate use case' do
-    #   use_case = instance_double(Buildings::CreateBuilding, call: { status: :ok, message: 'placeholder' })
-    #   allow(Buildings::CreateBuilding).to receive(:new).and_return(use_case)
+    context 'when an error occurs' do
+      before do
+        allow(Buildings::Index).to receive(:new).with(client).and_raise(
+          Buildings::Index::Error.new("Stranger Danger!!")
+        )
+      end
 
-    #   subject
 
-    #   expect(Buildings::CreateBuilding).to have_received(:index).with(params.stringify_keys)
-    #   expect(use_case).to have_received(:call)
-    # end
+      it 'does not raise an exception' do
+        expect { subject }.not_to raise_error
+      end
 
-    # context 'when an error occurs' do
-    #   it 'does not raise an exception' do
-    #     expect { subject }.not_to raise_error
-    #   end
+      it 'returns an unsuccessful HTTP status' do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
 
-    #   it 'returns a successful HTTP status' do
-    #     subject
-    #     expect(response).to have_http_status(:unprocessable_entity)
-    #   end
-
-    #   it 'returns JSON with a data' do
-    #     subject
-    #     expect(parsed_resp).to include('errors')
-    #   end
-    # end
+      it 'returns a response with errors' do
+        subject
+        expect(parsed_resp).to include('errors')
+      end
+    end
   end
 
   # describe "POST /api/clients/buildings" do
