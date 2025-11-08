@@ -5,7 +5,7 @@ RSpec.describe "Api::Clients::Buildings", type: :request do
   let(:url) { api_clients_buildings_path }
   let(:params) { { client_id: client.id } }
   let(:building) { create(:building, client:) }
-  let(:parsed_resp) { JSON.parse(response.body) }  
+  let(:parsed_resp) { JSON.parse(response.body) }
 
   # For spoofed authentication, current_client is always Client.first
   let!(:client) { create(:client) }
@@ -20,7 +20,7 @@ RSpec.describe "Api::Clients::Buildings", type: :request do
       subject
       expect(parsed_resp.keys).to include('status', 'status_code', 'data')
     end
-    
+
     it 'calls the Buildings::Index use case' do
       use_case = instance_double(Buildings::Index, call: { buildings: [] })
       allow(Buildings::Index).to receive(:new).with(client).and_return(use_case)

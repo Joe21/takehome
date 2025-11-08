@@ -12,7 +12,7 @@ RSpec.describe Client, type: :model do
     it { is_expected.to validate_uniqueness_of(:name).case_insensitive }
 
     context 'when name ends with whitespace' do
-      let(:name) { super() + "    "}
+      let(:name) { super() + "    " }
 
       before { subject.validate }
 

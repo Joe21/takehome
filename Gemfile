@@ -44,10 +44,10 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  gem 'rspec-rails', '~> 6.1.0'
-  gem 'factory_bot_rails'
-  gem 'faker'
-  gem 'shoulda-matchers', '~> 6.2'
+  gem "rspec-rails", "~> 6.1.0"
+  gem "factory_bot_rails"
+  gem "faker"
+  gem "shoulda-matchers", "~> 6.2"
 end
 
 group :development do
@@ -55,6 +55,5 @@ group :development do
   gem "web-console"
 
   # Highlight the fine-grained location where an error occurred [https://github.com/ruby/error_highlight]
-  gem "error_highlight", ">= 0.4.0", platforms: [:ruby]
+  gem "error_highlight", ">= 0.4.0", platforms: [ :ruby ]
 end
-

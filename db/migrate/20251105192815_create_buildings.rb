@@ -9,6 +9,6 @@ class CreateBuildings < ActiveRecord::Migration[7.2]
     end
 
     add_index :buildings, 'LOWER(address)', unique: true, name: 'index_buildings_on_lower_address'
-    add_index :buildings, [:state, :zip_code], name: 'index_buildings_on_state_and_zip_code'
+    add_index :buildings, [ :state, :zip_code ], name: 'index_buildings_on_state_and_zip_code'
   end
 end

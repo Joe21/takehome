@@ -5,7 +5,7 @@ module Buildings
 
     # Catch Validation Errors
     class ValidationError < StandardError; end
-    
+
     attr_reader :client, :params
     attr_accessor :building
 
@@ -22,7 +22,7 @@ module Buildings
         { building: serialize_building }
       else
         # Raise clientside 422
-        raise ValidationError, building.errors.full_messages.join(', ')
+        raise ValidationError, building.errors.full_messages.join(", ")
       end
     # let ValidationError propagate or it will be caught by StandError
     rescue ValidationError
@@ -49,9 +49,9 @@ module Buildings
         next unless expected_type
 
         case expected_type
-        when 'number'
+        when "number"
           raise ValidationError, "Invalid value for #{key}: expected number" unless value.is_a?(Numeric)
-        when 'string'
+        when "string"
           raise ValidationError, "Invalid value for #{key}: expected string" unless value.is_a?(String)
         when Array
           raise ValidationError, "Invalid value for #{key}: expected one of #{expected_type.join(', ')}" unless expected_type.include?(value)

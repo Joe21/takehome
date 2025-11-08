@@ -37,7 +37,7 @@ RSpec.describe Buildings::Index do
     let(:first_building) { subject[:buildings].first }
     let(:result_ids) { subject[:buildings].map { |b| b[:id] } }
     let(:all_custom_fields) { client.custom_fields.flat_map { |cf| cf.schema_store.keys }.uniq }
-    let(:field_values) {}
+    let(:field_values) { }
 
     it 'returns only buildings for the current client' do
       expect(result_ids).to match_array(buildings.map(&:id))

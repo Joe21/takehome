@@ -45,12 +45,12 @@ RSpec.describe CustomField, type: :model do
       end
 
       context 'with an array containing invalid types' do
-        let(:schema_store) { { "walkway_type" => ["string string", 123] } }
+        let(:schema_store) { { "walkway_type" => [ "string string", 123 ] } }
         it { is_expected.to be_invalid }
       end
 
       context 'with an array containing only valid strings' do
-        let(:schema_store) { { "walkway_type" => ["brick", "concrete", "none"] } }
+        let(:schema_store) { { "walkway_type" => [ "brick", "concrete", "none" ] } }
         it { is_expected.to be_valid }
       end
     end

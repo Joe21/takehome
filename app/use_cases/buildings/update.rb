@@ -27,7 +27,7 @@ module Buildings
       if building.save
         { building: serialize_building }
       else
-        raise ValidationError, building.errors.full_messages.join(', ')
+        raise ValidationError, building.errors.full_messages.join(", ")
       end
     rescue ActiveRecord::RecordNotFound
       raise BuildingNotFoundError, "Building not found"
@@ -54,16 +54,16 @@ module Buildings
         next unless expected_type
 
         case expected_type
-        when 'number'
+        when "number"
           raise ValidationError, "Invalid value for #{key}: expected number" unless value.is_a?(Numeric)
-        when 'string'
+        when "string"
           raise ValidationError, "Invalid value for #{key}: expected string" unless value.is_a?(String)
         when Array
           raise ValidationError, "Invalid value for #{key}: expected one of #{expected_type.join(', ')}" unless expected_type.include?(value)
         end
       end
     end
-    
+
     def serialize_building
       {
         id: building.id,

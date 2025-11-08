@@ -12,7 +12,7 @@ RSpec.describe Api::Clients::BuildingsController, type: :routing do
 
   describe 'POST #create' do
     let(:method) { :post }
-    
+
     it { is_expected.to route_to('api/clients/buildings#create') }
   end
 

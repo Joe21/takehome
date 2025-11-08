@@ -55,12 +55,12 @@ module Buildings
 
     def default_value_for(type)
       case type
-      when 'number'
+      when "number"
         0
-      when 'string', Array
-        '' # includes enums as empty string
+      when "string", Array
+        "" # includes enums as empty string
       else
-        ''
+        ""
       end
     end
   end

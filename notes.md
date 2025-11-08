@@ -132,3 +132,6 @@ Local VCS Strategy (joejung/submission_master)
 docker-compose up -d db
 docker-compose run --rm --service-ports web bash
 bundle exec rails s -b 0.0.0.0 -p 3000
+
+./bin/rubocop
+./bin/rubocop -a

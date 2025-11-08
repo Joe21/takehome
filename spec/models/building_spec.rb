@@ -32,7 +32,7 @@ RSpec.describe Building, type: :model do
         expect(subject).to be_valid
       end
     end
-    
+
     context 'when zip_code contains invalid characters' do
       before { subject.zip_code = "12345-ABCD" }
 
@@ -56,7 +56,7 @@ RSpec.describe Building, type: :model do
         create(:custom_field, client: client, schema_store: {
           "num_bathrooms"   => "number",
           "exterior_material" => "string",
-          "walkway_type"    => ["concrete", "gravel", "asphalt"]
+          "walkway_type"    => [ "concrete", "gravel", "asphalt" ]
         })
       end
 
