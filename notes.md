@@ -119,11 +119,13 @@ Local VCS Strategy (joejung/submission_master)
 - [merged] create_data_models
 - [merged] revise_data_models
 - [merged] separate_schema_and_data 
-- [] create_controllers
+- [merged] create_controllers
   - [x] setup
   - [x] payload
+  - [x] index
   - [x] pagination
-  - 
+  - [x] create
+  - [x] update
 - [] cleanup
 
 # Snippets
