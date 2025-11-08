@@ -3,7 +3,7 @@ module Api
     class BuildingsController < BaseController
       def index
         result = Buildings::Index.new(current_client).call
-        render json: formatter(result: result)
+        render json: formatter(result: result), status: :ok
       rescue Buildings::Index::Error => e
         # INSERT ERROR MONITORING ex: Rollbar / Sentry
         render json: formatter(errors: [e.message]), status: :unprocessable_entity
@@ -21,10 +21,19 @@ module Api
         render json: formatter(errors: [e.message]), status: :internal_server_error
       end
 
-      # def update
-      #   result = Buildings::Update.new(current_client, building_params).call
-      #   render json: format_response(result), status: :created
-      # end
+      def update
+        result = Buildings::Update.new(current_client, params[:id], building_params).call
+        render json: formatter(result: { building: result[:building] }), status: :ok
+      rescue Buildings::Update::BuildingNotFoundError => e
+        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+      # Handle clientside 422
+      rescue Buildings::Update::ValidationError => e
+        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+      # Handle internal 500's
+      rescue Buildings::Update::Error => e
+        # INSERT ERROR MONITORING ex: Rollbar / Sentry
+        render json: formatter(errors: [e.message]), status: :internal_server_error
+      end
 
       private
 

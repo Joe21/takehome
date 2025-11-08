@@ -1,33 +1,38 @@
 module Buildings
-  class Create
+  class Update
     # Catch Unknown Errors
     class Error < StandardError; end
 
     # Catch Validation Errors
     class ValidationError < StandardError; end
-    
-    attr_reader :client, :params
+
+    # Catch 404 Errors
+    class BuildingNotFoundError < StandardError; end
+
+    attr_reader :building_id, :client, :params
     attr_accessor :building
 
-    def initialize(client, params)
+    def initialize(client, building_id, params)
       @client = client
+      @building_id = building_id
       @params = params.permit(:address, :zip_code, :state, custom_field_values: {})
     end
 
     def call
+      # Lookup building inside call to handle missing record
+      self.building = client.buildings.find(building_id)
       validate_custom_fields!
-      self.building = client.buildings.new(params)
+      building.assign_attributes(params)
 
       if building.save
         { building: serialize_building }
       else
-        # Raise clientside 422
         raise ValidationError, building.errors.full_messages.join(', ')
       end
-    # let ValidationError propagate or it will be caught by StandError
+    rescue ActiveRecord::RecordNotFound
+      raise BuildingNotFoundError, "Building not found"
     rescue ValidationError
       raise
-    # Raise internal 500
     rescue StandardError => e
       raise Error, e.message
     end
@@ -58,7 +63,7 @@ module Buildings
         end
       end
     end
-
+    
     def serialize_building
       {
         id: building.id,

@@ -56,7 +56,6 @@ RSpec.describe "Api::Clients::Buildings", type: :request do
   describe 'create' do
     let(:http_method) { :post }
     let(:url) { api_clients_buildings_path }
-    let(:parsed_resp) { JSON.parse(response.body) }
     let(:params) do
       {
         address: '1 Real Building 1st Real Ave',
@@ -114,33 +113,79 @@ RSpec.describe "Api::Clients::Buildings", type: :request do
     end
   end
 
+  describe 'update' do
+    let(:http_method) { :put }
+    let(:url) { api_clients_building_path(building.id) }
+    let(:params) do
+      {
+        address: 'Updated Building 2nd Ave',
+        zip_code: '54321',
+        state: 'NY',
+        custom_field_values: { 'parking_spots' => 20, 'material' => 'concrete' }
+      }
+    end
+
+    before do
+      create(:building, client: client)
+      # Seed the custom fields for validation
+      create(:custom_field, client: client, schema_store: { 'parking_spots' => 'number' })
+      create(:custom_field, client: client, schema_store: { 'material' => 'string' })
+    end
+
+    it 'returns a successful HTTP status' do
+      subject
+      expect(response).to have_http_status(:ok)
+    end
 
 
-  # describe "POST /api/clients/buildings" do
-  #   it "returns a created placeholder JSON response" do
-  #     post api_client_buildings_path(client_id: client.id), params: {
-  #       address: "123 Main St",
-  #       zip_code: "12345",
-  #       state: "AL"
-  #     }
+    it 'returns the correct json structure' do
+      subject
+      expect(parsed_resp.keys).to include('status', 'status_code', 'data')
+      expect(parsed_resp['data']).to include('building')
+      expect(parsed_resp['data']['building']).to include('id', 'address', 'zip_code', 'state', 'custom_field_values')
+    end
 
-  #     expect(response).to have_http_status(:created)
-  #     json = JSON.parse(response.body)
-  #     expect(json['status']).to eq('created')
-  #     expect(json['message']).to eq('Building created (placeholder)')
-  #   end
-  # end
+    it 'calls the Buildings::Update use case' do
+      use_case = instance_double(Buildings::Update, call: { building: building })
+      allow(Buildings::Update).to receive(:new).and_return(use_case)
+      subject
+      expect(Buildings::Update).to have_received(:new).with(client, building.id.to_s, kind_of(ActionController::Parameters))
+      expect(use_case).to have_received(:call)
+    end
 
-  # describe "PUT /api/clients/buildings/:id" do
-  #   it "returns an updated placeholder JSON response" do
-  #     put api_client_buildings_path(client_id: client.id, id: building.id), params: {
-  #       address: "123 Main St Updated"
-  #     }
+    context 'when building is not found' do
+      let(:url) { api_clients_building_path(9999) }
 
-  #     expect(response).to have_http_status(:ok)
-  #     json = JSON.parse(response.body)
-  #     expect(json['status']).to eq('ok')
-  #     expect(json['message']).to eq('Building updated (placeholder)')
-  #   end
-  # end
+      it 'returns 422 unprocessable entity' do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'returns the error message' do
+        subject
+        expect(parsed_resp['errors'].first).to match(/Building not found/)
+      end
+    end
+
+    context 'when a validation error occurs' do
+      let(:params) do
+        {
+          address: '',
+          zip_code: '54321',
+          state: 'NY',
+          custom_field_values: { 'parking_spots' => 'invalid', 'material' => 'concrete' }
+        }
+      end
+
+      it 'returns 422 unprocessable entity' do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'returns the error message' do
+        subject
+        expect(parsed_resp['errors'].first).to match(/Invalid value for parking_spots/)
+      end
+    end
+  end
 end
