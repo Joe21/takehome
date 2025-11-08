@@ -3,8 +3,11 @@ require 'rails_helper'
 RSpec.describe Buildings::Index do
   subject { described_class.new(client).call }
 
+  let(:client) { create(:client, name: 'Acme Co') }
+
   let!(:custom_field1) { create(:custom_field, client:, schema_store: { "rock_wall_size" => "number", "rock_wall_length" => "number" }) }
   let!(:custom_field2) { create(:custom_field, client:, schema_store: { "brick_color" => "string", "brick_count" => "number" }) }
+
   let!(:buildings) do
     [
       create(:building, client:, state: 'NY', zip_code: '12345', custom_field_values: {
@@ -31,10 +34,10 @@ RSpec.describe Buildings::Index do
   end
 
   describe '#call' do
-    let(:client) { create(:client, name: 'Acme Co') }
     let(:first_building) { subject[:buildings].first }
     let(:result_ids) { subject[:buildings].map { |b| b[:id] } }
     let(:all_custom_fields) { client.custom_fields.flat_map { |cf| cf.schema_store.keys }.uniq }
+    let(:field_values) { subject[:buildings].map { |b| all_custom_fields.index_with { |k| b[k] } } } 
 
     it 'returns only buildings for the current client' do
       expect(result_ids).to match_array(buildings.map(&:id))
@@ -55,7 +58,6 @@ RSpec.describe Buildings::Index do
     end
 
     it 'includes the correct custom field values for each building' do
-      field_values = subject[:buildings].map { |b| all_custom_fields.index_with { |k| b[k] } }
       expect(field_values).to include({
         "rock_wall_size" => 15,
         "rock_wall_length" => 26,
