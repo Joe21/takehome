@@ -11,12 +11,13 @@ module Api
       end
 
       def formatter(result: nil, errors: nil, status: :ok)
-        hash = {
-          status: status.to_s,
-          status_code: Rack::Utils::SYMBOL_TO_STATUS_CODE[status]
-        }
-        errors.present? ? hash[:errors] = Array(errors) : hash[:data] = result
-        hash
+        body = { status_code: Rack::Utils::SYMBOL_TO_STATUS_CODE[status] }
+
+        if errors
+          body.merge(status: 'error', errors:)
+        else
+          body.merge(status: 'success', data: result)
+        end
       end
     end
   end

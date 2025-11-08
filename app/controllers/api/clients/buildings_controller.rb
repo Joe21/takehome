@@ -6,33 +6,33 @@ module Api
         render json: formatter(result: result), status: :ok
       rescue Buildings::Index::Error => e
         # INSERT ERROR MONITORING ex: Rollbar / Sentry
-        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+        render json: formatter(errors: [e.message], status: :unprocessable_content), status: :unprocessable_content
       end
 
       def create
         result = Buildings::Create.new(current_client, building_params).call
-        render json: formatter(result: { building: result[:building] }), status: :created
+        render json: formatter(result: { building: result[:building] }, status: :created), status: :created
       # Handle clientside 422 
       rescue Buildings::Create::ValidationError => e
-        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+        render json: formatter(errors: [e.message], status: :unprocessable_content), status: :unprocessable_content
       # Handle internal 500's
       rescue Buildings::Create::Error => e
         # INSERT ERROR MONITORING ex: Rollbar / Sentry
-        render json: formatter(errors: [e.message]), status: :internal_server_error
+        render json: formatter(errors: [e.message], status: :internal_server_error), status: :internal_server_error
       end
 
       def update
         result = Buildings::Update.new(current_client, params[:id], building_params).call
-        render json: formatter(result: { building: result[:building] }), status: :ok
+        render json: formatter(result: { building: result[:building] }, status: :ok), status: :ok
       rescue Buildings::Update::BuildingNotFoundError => e
-        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+        render json: formatter(errors: [e.message], status: :unprocessable_content), status: :unprocessable_content
       # Handle clientside 422
       rescue Buildings::Update::ValidationError => e
-        render json: formatter(errors: [e.message]), status: :unprocessable_entity
+        render json: formatter(errors: [e.message], status: :unprocessable_content), status: :unprocessable_content
       # Handle internal 500's
       rescue Buildings::Update::Error => e
         # INSERT ERROR MONITORING ex: Rollbar / Sentry
-        render json: formatter(errors: [e.message]), status: :internal_server_error
+        render json: formatter(errors: [e.message], status: :internal_server_error), status: :internal_server_error
       end
 
       private
